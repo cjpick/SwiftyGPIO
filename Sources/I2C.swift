@@ -320,7 +320,7 @@ public final class SysFSI2C: I2CInterface {
                             size: I2C_SMBUS_WORD_DATA,
                             data: &data)
         if r >= 0 {
-            return Int32(data[1] << 8) + Int32(data[0] >> 8)
+            return (Int32(data[1]) << 8) + (Int32(data[0]) >> 8)
         } else {
             return -1
         }
@@ -335,7 +335,7 @@ public final class SysFSI2C: I2CInterface {
                             data: &data)
         if r >= 0 {
             for i in 0..<Int(data[0]) {
-                values[i-1] = data[i+1]
+                values[i] = data[i+1]
             }
             return Int32(data[0])
         } else {
@@ -387,7 +387,7 @@ public final class SysFSI2C: I2CInterface {
     private func i2c_smbus_write_block_data(command: UInt8, values: [UInt8]) -> Int32 {
         var data = [UInt8](repeating:0, count: I2C_MAX_LENGTH+1)
 
-        for i in 1..<values.count {
+        for i in 1...values.count {
             data[i] = values[i-1]
         }
         data[0] = UInt8(values.count)
@@ -419,6 +419,6 @@ internal let I2C_MAX_LENGTH: Int = 32
 internal let I2CBASEPATH="/dev/i2c-"
 
 // MARK: - Darwin / Xcode Support
-#if os(OSX)
+#if os(OSX) || os(iOS)
     private var O_SYNC: CInt { fatalError("Linux only") }
 #endif

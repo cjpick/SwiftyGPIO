@@ -1,24 +1,30 @@
-![SwiftyGPIO](https://github.com/uraimo/SwiftyGPIO/raw/master/logo.png)
+<p align="center" style="padding-bottom:50px;">
+<img src="https://github.com/uraimo/SwiftyGPIO/raw/master/logo.png"/>
+</p>
 
-**A Swift library to interact with Linux GPIOs/SPI/I2C/PWM/UART and use leds, sensors, displays and much more!**
+<p align="center">
+	<a href="https://raw.githubusercontent.com/uraimo/SwiftyGPIO/master/LICENSE"><img src="http://img.shields.io/badge/License-MIT-blue.svg?style=flat"/></a>
+	<a href="#"><img src="https://img.shields.io/badge/OS-linux-green.svg?style=flat"/></a> 
+	<a href="https://developer.apple.com/swift"><img src="https://img.shields.io/badge/Swift-3.x-orange.svg?style=flat"/></a> 
+	<a href="https://github.com/apple/swift-package-manager"><img src="https://img.shields.io/badge/Swift%20Package%20Manager-compatible-brightgreen.svg"/></a>
+	<a href="https://slackpass.io/swift-arm"><img src="https://img.shields.io/badge/Slack-swift/arm-red.svg?style=flat"/></a>
+</p>
 
-
-[![Linux-only](https://img.shields.io/badge/OS-linux-green.svg?style=flat)](#) 
-[![License: MIT](http://img.shields.io/badge/License-MIT-blue.svg?style=flat)](https://raw.githubusercontent.com/uraimo/SwiftyGPIO/master/LICENSE) 
-[![Swift 3.x](https://img.shields.io/badge/Swift-3.x-orange.svg?style=flat)](https://developer.apple.com/swift) 
-[![Swift Package Manager compatible](https://img.shields.io/badge/Swift%20Package%20Manager-compatible-brightgreen.svg)](https://github.com/apple/swift-package-manager)
-[![Join the slack channel](https://img.shields.io/badge/Slack-swift/arm-red.svg?style=flat)](https://slackpass.io/swift-arm)
-
+<p align="center">
+<i>A Swift library for hardware projects on Linux/ARM boards with support for GPIOs/SPI/I2C/PWM/UART/1Wire.</i>
+</p>
 
 ![](images/banner.jpg)
 
 ## Summary
 
-This library provides an easy way to interact with external sensors and devices using the digital GPIOs, SPI/I2C interfaces, PWM signals and serial ports that boards like the Raspberry Pi provide, on Linux using Swift.
+This library provides an easy way to interact with external sensors and devices using the digital GPIOs, SPI/I2C interfaces, 1-Wire buses, PWM signals and serial ports that boards like the Raspberry Pi provide, on Linux using Swift.
 
 Like Android Things or similar libraries in Python, SwiftyGPIO provides the basic functionalities you'll need to control different devices: sensors, displays, input devices like joypads, RGB led strips and matrices.
 
-You'll be able to configure port attributes and read/write the current GPIOs value, use the [SPI](https://en.wikipedia.org/wiki/Serial_Peripheral_Interface_Bus) interfaces (via hardware if your board provides them or using software big-banging SPI), comunicate over a bus with [I2C](https://learn.sparkfun.com/tutorials/i2c), generate a [PWM](https://en.wikipedia.org/wiki/Pulse-width_modulation) to drive external displays, servos, leds and more complex sensors, and finally interact with devices that expose [UART](https://learn.sparkfun.com/tutorials/serial-communication) serial connections using AT commands or custom protocols. See the *[libraries](#libraries)* for some device libraries built using SwiftyGPIO.
+You'll be able to configure port attributes and read/write the current GPIOs value, use the [SPI](https://en.wikipedia.org/wiki/Serial_Peripheral_Interface_Bus) interfaces (via hardware if your board provides them or using software big-banging SPI), comunicate over a bus with [I2C](https://learn.sparkfun.com/tutorials/i2c), generate a [PWM](https://en.wikipedia.org/wiki/Pulse-width_modulation) to drive external displays, servos, leds and more complex sensors, interact with devices that expose [UART](https://learn.sparkfun.com/tutorials/serial-communication) serial connections using AT commands or custom protocols, and finally connect to [1-Wire](https://en.wikipedia.org/wiki/1-Wire) devices. 
+
+See the *[libraries](#libraries)* for some device libraries built using SwiftyGPIO.
 
 The library is built to run **exclusively on Linux ARM Boards** (RaspberryPis, BeagleBone Black, CHIP, etc...) with accessible GPIO pins.
 
@@ -33,6 +39,7 @@ The library is built to run **exclusively on Linux ARM Boards** (RaspberryPis, B
     - [PWM](#pwm)
     - [Pattern-based signal generator via PWM](#pattern-based-signal-generator-via-pwm)
     - [UART](#uart)
+    - [1-Wire](#1-wire)
 - [Examples](#examples)
 - [Built with SwiftyGPIO](#built-with-swiftygpio)
     - [Device Libraries](#libraries)
@@ -61,12 +68,7 @@ The following boards are supported and have been tested with recent releases of 
 
 But basically everything that has an ARMv7+Ubuntu16/Debian/Raspbian or an ARMv6+Raspbian/Debian should work if you can run Swift on it.
 
-Considering that, these board should also work with SwiftyGPIO once you get Swift running:
-
-* OLinuXinos
-* ODROIDs
-* Cubieboards
-* Tegra Jetson TK1
+Considering that, other ARMv7/8 boards should also work with SwiftyGPIO once you get Swift running.
 
 Please keep in mind that Swift on ARM is a completely community-driven effort, and that there are a multitude of possible board+OS configurations, don't expect that everything will work right away on every configuration, especially if you are the first to try a new configuration.
 
@@ -78,7 +80,7 @@ If you have a RaspberryPi (A,B,A+,B+,Zero,ZeroW,2,3) with Ubuntu or Raspbian, ge
 
 I always recommend to try one of the latest binaries available (either Ubuntu Mate or Raspbian) before putting in the time to compile it yourself, those binaries could(and do most of the times) also work on seemingly different OSes and on different boards.
 
-And alternatively, you can setup a cross-compiling toolchain and build ARM binaries (Ubuntu/Raspbian) from a Mac, thanks again to the work of Helge Heß (and Johannes Weiß for implementing it in SPM), read more about that [here](https://github.com/helje5/dockSwiftOnARM/blob/master/toolchain/README.md). The toolchain supports SPM.
+And alternatively, you can setup a cross-compiling toolchain and build ARM binaries (Ubuntu/Raspbian) from a Mac, thanks again to the work of Helge Heß (and Johannes Weiß for implementing it in SPM), read more about that [here](https://github.com/AlwaysRightInstitute/swift-mac2arm-x-compile-toolchain). The toolchain supports SPM.
 
 If your version of Swift supports the SPM, you just need to add SwiftyGPIO as a dependency in your `Package.swift`:
 
@@ -94,21 +96,9 @@ And then build with `swift build`.
 
 The compiler will create an executable under `.build/`.
 
-If your version of Swift does not support the Swift Package Manager, download manually all the needed files: 
+**IMPORTANT:** As everything interacting with GPIOs via sysfs/mmapped registers, if your OS does not come with a predefined user group to access these functionalities, you'll need to run your application with root privileges using `sudo`. If you are using a RaspberryPi with a recent Raspbian (post November 2016) or a recent Ubuntu (from 16.04 Xenial onward) implementing /dev/gpiomem, this will be not required to use basic GPIOs, just launch your application calling the executable built by the compiler.
 
-    wget https://raw.githubusercontent.com/uraimo/SwiftyGPIO/master/Sources/SwiftyGPIO.swift https://raw.githubusercontent.com/uraimo/SwiftyGPIO/master/Sources/Presets.swift https://raw.githubusercontent.com/uraimo/SwiftyGPIO/master/Sources/SunXi.swift https://raw.githubusercontent.com/uraimo/SwiftyGPIO/master/Sources/SPI.swift https://raw.githubusercontent.com/uraimo/SwiftyGPIO/master/Sources/PWM.swift https://raw.githubusercontent.com/uraimo/SwiftyGPIO/master/Sources/Mailbox.swift https://raw.githubusercontent.com/uraimo/SwiftyGPIO/master/Sources/I2C.swift https://raw.githubusercontent.com/uraimo/SwiftyGPIO/master/Sources/UART.swift
-
-And once downloaded, in the same directory create an additional file that will contain the code of your application named `main.swift`. 
-
-When your code is ready, compile it (every functionality is modularized in a different file, so that the PWM, SPI, I2C, UART files can be deleted if you don't need them) with:
-
-    swiftc *.swift
-    
-The compiler will create a **main** executable.
-
-**IMPORTANT:** As everything interacting with GPIOs via sysfs/mmapped registers, if your OS does not come with a predefined user group to access these functionalities, you'll need to run your application with root privileges using `sudo ./main`. If you are using a RaspberryPi with a recent Raspbian (post November 2016) or a recent Ubuntu (from 16.04 Xenial onward) implementing /dev/gpiomem, this will be not required to use basic GPIOs, just launch your application with `./main`.
-
-On misconfigured systems, features like the listeners may require root privileges anyway. Advanced features like PWM still require root privileges.
+On misconfigured systems, features like the listeners may require root privileges too and advanced features like PWM always  require root privileges.
 
 Alternatively, a specific user group for gpio access can be configured manually as shown [here](https://arcanesciencelab.wordpress.com/2016/03/31/running-rpi3-applications-that-use-gpio-without-being-root/) or in this [answer on stackoverflow](https://stackoverflow.com/questions/30938991/access-gpio-sys-class-gpio-as-non-root/30940526#30940526).
 After following those instruction, remember to add your user (e.g. pi) to the gpio group with `sudo usermod -aG gpio pi` and to reboot so that the changes you made are applied.
@@ -132,7 +122,7 @@ Currently, SwiftyGPIO expose GPIOs, SPIs(if not available a bit-banging VirtualS
 
 Let's suppose we are using a Raspberry 2 board and have a led connected between the GPIO pin P2 (possibly with a resistance of 1K Ohm or so) and GND and we want to turn it on.
 
-Note that SwiftyGPIO uses the raw Broadcom numbering scheme ([described here](https://github.com/uraimo/SwiftyGPIO/wiki/GPIO-Pinout)) to assign a number to each pin.
+Note that SwiftyGPIO uses the *raw Broadcom numbering scheme* ([described here](https://github.com/uraimo/SwiftyGPIO/wiki/GPIO-Pinout)) to assign a number to each pin.
 
 First, we need to retrieve the list of GPIOs available on the board and get a reference to the one we want to modify:
 
@@ -184,7 +174,16 @@ gp.direction = .IN
 let current = gp.value
 ```
 
-The other properties available on the GPIO object (edge,active low) refer to the additional attributes of the GPIO that can be configured but you will not need them most of the times. For a detailed description refer to the [kernel documentation](https://www.kernel.org/doc/Documentation/gpio/sysfs.txt)
+Some boards like the RaspberryPi allow to enable a pull up/down resistance on some of the GPIO pins to connect a pin to 3.3V (.up), 0V (.down) or leave it floating (.neither) by default when external devices are disconnected, to enable it just set the `pull` property:
+
+```swift
+gp.direction = .IN
+gp.pull = .up
+```
+
+The pull state can only be set and not read back.
+
+The other properties available on the GPIO object (edge,active low) refer to the additional attributes of the GPIO that can be configured but you will not need them most of the times. For a detailed description refer to the [kernel documentation](https://www.kernel.org/doc/Documentation/gpio/sysfs.txt).
 
 GPIOs also support the execution of closures when the value of the pin changes. Closures can be added with `onRaising` (the pin value changed from 0 to 1), `onFalling` (the value changed from 1 to 0) and `onChange` (the value simply changed from the previous one):
 
@@ -471,6 +470,21 @@ func readLine() -> String
 
 A specific method that reads lines of text (`\n` is used as line terminator, the serial read is still non-canonical) is also provided.
 
+### 1-Wire
+
+If your board provides a 1-Wire port (right now only RaspberryPi boards), you can retrieve the list of available `OneWireInterface` with `SwiftyGPIO.hardware1Wires(for:)`:
+
+```swift
+let onewires = SwiftyGPIO.hardware1Wires(for:.RaspberryPi2)!
+var onewire = onewires[0]
+```
+
+To retrieve the string identifiers associated to the devices connected to the 1-Wire bus, call `getSlaves()`.
+
+The data provided by these devices can then be retrieved via `readData(slaveId:)` using one of the identifiers obtained at the previous step.
+
+The data coming from the device is returned by the Linux driver as a series of lines, most of which will be just protocol data you should just ignore. Check out the reference of your sensor to know how to interpret the formatted information. 
+ 
 
 ## Examples
 
@@ -531,17 +545,18 @@ Notice that we are converting the 0x9F `Int` using the constructor `UInt8(trunca
 A few projects and libraries built using SwiftyGPIO. Have you built something that you want to share? Let me know!
 
 ### Libraries
+* [WS281x Leds](https://github.com/uraimo/WS281x.swift) - A library for WS2812x (WS2811,WS2812,WS2812B) RGB led strips, rings, sticks, matrices, etc...
 * [Nokia5110(PCD8544) 128x64 LCD](http://github.com/uraimo/5110lcd_pcd8544.swift) - Show text and graphics on a Nokia 3110/5110 LCD display.
 * [HD44780U Character LCD](https://github.com/uraimo/HD44780CharacterLCD.swift) - Show text on character LCDs controlled by the HD44780 or one of its clones.
 * [DHTxx Temperature Sensor](https://github.com/pj4533/dhtxx) - Read temperature and humidity values from sensors of the DHT family (DHT11, DHT22, AM2303).
 * [SG90 Servo Motor](https://github.com/uraimo/SG90Servo.swift) - Drives a SG90 servo motor via PWM but can be easily modified to use other kind of servos.
 * [MCP3008 10 bits ADC](https://github.com/uraimo/MCP3008.swift) - Convert analog values to integers with this SPI-driven ADC.
-* [WS281x Leds](https://github.com/uraimo/WS281x.swift) - A library for WS2812x (WS2811,WS2812,WS2812B) RGB led strips, rings, sticks, matrices, etc...
 * [u-Blox GPS Receivers](https://github.com/uraimo/UBloxGPS.swift) - Get location data from boards with the u-Blox 6/7/8 family of A-GPS receivers with an UART serial connection (e.g. NEO6M).
 * [MPU-6050 Accelerometer/Gyro](https://github.com/uraimo/MPU-6050.swift) - A library for the MPU-6050 (and MPU-6000 family) Accelerometer and Gyroscope.
 * [DS1307 RTC](https://github.com/uraimo/DS1307.swift) - A library for the DS1307 (DS1302, DS3231) I2C Real-Time Clock.
-* [Wii Nunchuck](https://github.com/uraimo/Nunchuck.swift) - A Library for the Wii Nunchuck controller.
-
+* [Wii Nunchuck](https://github.com/uraimo/Nunchuck.swift) - A library for the Wii Nunchuck controller.
+* [RCWL-0516](https://github.com/uraimo/RCWL-0516-Radar.swift) - A Swift library for the RCWL-0516 Microwave Radar.
+* [DS18B20](https://github.com/uraimo/DS18B20.swift) - A library for the DS18B20 temperature sensor.
 
 
 ### Awesome Projects 
