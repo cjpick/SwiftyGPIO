@@ -39,7 +39,7 @@ public class GPIO {
     public private(set) var id: Int = 0
     var exported = false
     var listening = false
-    var intThread: Thread?
+    var intThread: Thread?
     var intFuncFalling: ((GPIO) -> Void)?
     var intFuncRaising: ((GPIO) -> Void)?
     var intFuncChange: ((GPIO) -> Void)?
